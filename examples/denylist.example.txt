@@ -1,0 +1,35 @@
+# Example private denylist for prepublish-audit.
+#
+# Copy this file OUTSIDE every repository, for example to
+#   ~/.config/prepublish-audit/denylist.txt
+# and make it private:  chmod 600 ~/.config/prepublish-audit/denylist.txt
+# Everything below is invented; replace it with your own values.
+
+# Plain lines are literals, matched case-insensitively anywhere.
+# Whitespace inside an entry also matches line breaks and repeated spaces.
+Acme Internal Tools
+Project Heron
+heron-staging-db
+
+# Account and customer IDs. "word:" stops 4821 matching inside 148210.
+1234509876
+word:4821
+
+# People and internal addresses.
+Jane Example
+jane.example@acme-corp.example
+
+# Regular expressions start with "re:" (Python syntax, case-insensitive).
+re:\bacme-(?:prod|staging)-[a-z0-9-]+\b
+re:\bHERON-\d{3,}\b
+
+# "loose:" ignores spaces, dots, dashes and underscores between words, so
+# this also catches heron-dashboard, heron_dashboard and herondashboard.
+loose:heron dashboard
+
+# A public name that may appear in a few places: give it a label and allow
+# contexts. Reports show the label, never the entry.
+Acme Corp
+  label: company name
+  allow: LICENSE
+  allow: README.md section=^About

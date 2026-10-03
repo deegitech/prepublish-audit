@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.tox/
+.nox/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Reports you may generate locally (they can contain revealed matches)
+*.sarif
+prepublish-audit-report*.json
+
+# Private denylists must never be committed
+denylist.txt
+denylist.toml
+denylist.json
+*.denylist
+*.denylist.txt
+
+# Editors and operating systems
+.DS_Store
+._*
+Thumbs.db
+.idea/
+.vscode/
+*.swp

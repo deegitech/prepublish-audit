@@ -1,0 +1,18 @@
+# prepublish-audit settings for this repository. This file is public:
+# it only tunes built-in rules. Private strings live in a denylist that is
+# never committed (see README, "The private denylist").
+
+fail-on = "warning"
+# Commits from outside contributors often carry a personal address. Report it
+# without failing CI: public history cannot be changed after a merge.
+severity = { "git.author-identity" = "note" }
+
+[[allow]]
+rules = ["leak.*", "metadata.*", "secret.sensitive-file"]
+paths = ["tests/**"]
+reason = "Test fixtures are invented, leak-shaped data that the tests must detect."
+
+[[allow]]
+rules = ["leak.*"]
+paths = ["examples/**"]
+reason = "Example configs and denylists use invented IDs, hosts and addresses."

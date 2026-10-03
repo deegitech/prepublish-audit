@@ -1,0 +1,97 @@
+name: prepublish-audit
+description: Block secrets and internal information before you open-source a repo, publish a site or share a bundle.
+author: DEEGITECH
+branding:
+  icon: shield
+  color: purple
+
+inputs:
+  path:
+    description: File or directory to scan, relative to the workspace.
+    required: false
+    default: "."
+  denylist:
+    description: >-
+      Content of your private denylist, passed from a secret such as
+      secrets.PREPUBLISH_DENYLIST. It is written to a 0600 file under
+      RUNNER_TEMP, given to the scanner by path (never on a command line)
+      and deleted when the step ends.
+    required: false
+    default: ""
+  require-denylist:
+    description: >-
+      Fail when no denylist is available. Pull requests from forks do not
+      receive secrets, so keep this false if you accept outside contributions.
+    required: false
+    default: "false"
+  history:
+    description: Also scan the whole git history (check out with fetch-depth 0).
+    required: false
+    default: "true"
+  git-files:
+    description: Scan only the files git would publish (tracked plus untracked, not ignored).
+    required: false
+    default: "false"
+  fail-on:
+    description: >-
+      Lowest severity that fails the step (error, warning, note or never).
+      Empty: the repository config decides (default warning).
+    required: false
+    default: ""
+  sarif-file:
+    description: >-
+      Write a SARIF 2.1.0 report to this path, for github/codeql-action/upload-sarif.
+      Paths that contain a denylist entry are masked in it, like in every other
+      report; add --sarif-real-paths to args to keep them (private repositories only).
+    required: false
+    default: ""
+  json-file:
+    description: Write the JSON report to this path.
+    required: false
+    default: ""
+  config:
+    description: Path to a config file (default is discovery from the scanned path).
+    required: false
+    default: ""
+  gitleaks:
+    description: >-
+      Also run gitleaks when it is installed (auto), require it (always) or skip it (never).
+      Empty: the repository config decides (default auto).
+    required: false
+    default: ""
+  args:
+    description: Extra command-line arguments, separated by spaces (no shell expansion).
+    required: false
+    default: ""
+
+outputs:
+  exit-code:
+    description: 0 = passed, 1 = findings at or above fail-on, 2 = error.
+    value: ${{ steps.audit.outputs.exit-code }}
+  findings:
+    description: Number of findings.
+    value: ${{ steps.audit.outputs.findings }}
+  sarif-file:
+    description: Path of the SARIF report, when one was requested.
+    value: ${{ steps.audit.outputs.sarif-file }}
+
+runs:
+  using: composite
+  steps:
+    - name: Run prepublish-audit
+      id: audit
+      shell: bash
+      env:
+        PA_ACTION_PATH: ${{ github.action_path }}
+        PA_PATH: ${{ inputs.path }}
+        PA_DENYLIST: ${{ inputs.denylist }}
+        PA_REQUIRE_DENYLIST: ${{ inputs.require-denylist }}
+        PA_HISTORY: ${{ inputs.history }}
+        PA_GIT_FILES: ${{ inputs.git-files }}
+        PA_FAIL_ON: ${{ inputs.fail-on }}
+        PA_SARIF: ${{ inputs.sarif-file }}
+        PA_JSON: ${{ inputs.json-file }}
+        PA_CONFIG: ${{ inputs.config }}
+        PA_GITLEAKS: ${{ inputs.gitleaks }}
+        PA_ARGS: ${{ inputs.args }}
+      run: bash "$PA_ACTION_PATH/scripts/github-action.sh"

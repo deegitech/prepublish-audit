@@ -1,0 +1,21 @@
+name: Feature request
+description: Suggest a new rule, format or integration.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What leaked, or what is hard today?
+      description: Describe the situation with invented data.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would help
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered

@@ -1,0 +1,52 @@
+name: Bug report
+description: Something does not work as documented.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Never paste secrets, denylist entries, real IDs, emails or internal paths into an issue.**
+        Replace them with invented values that still reproduce the problem. Run without `--reveal`
+        when you copy output: reports are redacted by default.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Output of `prepublish-audit --version`
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: >-
+        Your operating system and the output of `prepublish-audit doctor` (it never prints denylist
+        entries or your commit email; check the paths it shows before you paste them).
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened (redacted output)
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Minimal reproduction with invented data
+      description: A few lines or a small file that triggers the problem.

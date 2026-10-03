@@ -1,0 +1,35 @@
+name: False positive or missed leak
+description: A rule fired on harmless content, or did not fire on something it should catch.
+labels: [detection]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Do not paste the real value.** Describe its shape instead (for example: "a 12-digit number
+        after `customer=` in a YAML file") and give an invented example with the same shape.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind
+      options:
+        - False positive (fired on harmless content)
+        - False negative (missed a leak)
+    validations:
+      required: true
+  - type: input
+    id: rule
+    attributes:
+      label: Rule ID
+      description: For example `leak.numeric-id` (see docs/rules.md).
+  - type: textarea
+    id: example
+    attributes:
+      label: Invented example with the same shape
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: File type and context
+      description: File name pattern, surrounding syntax, where the content comes from.

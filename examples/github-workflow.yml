@@ -1,0 +1,81 @@
+# .github/workflows/prepublish-audit.yml
+#
+# Two jobs:
+#
+# * "audit" runs the built-in rules on every push and pull request. It never
+#   sees the denylist.
+# * "denylist-audit" adds your private denylist. Anyone who can push a branch
+#   can change a pull request's workflow and print its secrets, so this job
+#   does not run on pull requests, and it uses an environment: create
+#   "prepublish-audit" under Settings > Environments, add required reviewers,
+#   and store the denylist content there as PREPUBLISH_DENYLIST. Keep that list
+#   to what this repository needs, not your organisation's full list.
+#
+# The local pre-push hook (examples/pre-commit-config.yaml) is the gate that
+# runs before anything leaves your machine; CI is the backstop.
+#
+# Pin the action to the full commit SHA of the release, for example:
+#   git ls-remote https://github.com/deegitech/prepublish-audit refs/tags/v0.1.0
+# and write: uses: deegitech/prepublish-audit@<that SHA> # v0.1.0
+name: prepublish-audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write   # only needed for the SARIF upload
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0        # the history scan needs every commit
+          persist-credentials: false
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+
+      - name: prepublish-audit (built-in rules)
+        uses: deegitech/prepublish-audit@v0.1.0   # replace with the release commit SHA, see above
+        with:
+          history: "true"
+          sarif-file: prepublish-audit.sarif
+
+      - name: Upload to code scanning
+        if: always() && hashFiles('prepublish-audit.sarif') != ''
+        uses: github/codeql-action/upload-sarif@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        with:
+          sarif_file: prepublish-audit.sarif
+          category: prepublish-audit
+
+  denylist-audit:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment: prepublish-audit   # required reviewers + the PREPUBLISH_DENYLIST secret
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+
+      - name: prepublish-audit (denylist and built-in rules)
+        uses: deegitech/prepublish-audit@v0.1.0   # replace with the release commit SHA, see above
+        with:
+          denylist: ${{ secrets.PREPUBLISH_DENYLIST }}
+          require-denylist: "true"
+          history: "true"

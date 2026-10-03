@@ -1,0 +1,25 @@
+# The same idea in TOML (Python 3.11+, or pip install 'prepublish-audit[toml]').
+# Keep the real file outside every repository and chmod 600 it.
+
+[[entries]]
+literal = "Acme Internal Tools"
+
+[[entries]]
+regex = '\bacme-(?:prod|staging)-[a-z0-9-]+\b'
+label = "internal hostnames"
+
+[[entries]]
+word = "4821"
+label = "card ending"
+
+[[entries]]
+loose = "heron dashboard"
+
+[[entries]]
+literal = "Acme Corp"
+label = "company name"
+allow = [
+  { path = "LICENSE" },
+  { path = "README.md", section = "^About" },
+  { path = "**/*.py", line = "^# Copyright" },
+]

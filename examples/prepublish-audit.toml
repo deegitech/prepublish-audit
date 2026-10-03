@@ -1,0 +1,40 @@
+# Example public settings: save as .prepublish-audit.toml at the repository
+# root (or put the same keys under [tool.prepublish-audit] in pyproject.toml).
+# This file is committed, so it must not contain private values.
+
+fail-on = "warning"            # error | warning | note ("never" only on the command line)
+# Skipped by the built-in rules. A loaded denylist still checks these paths;
+# use --exclude on the command line to skip a path completely.
+exclude = ["dist/**", "*.min.js"]
+max-file-size = "32MiB"        # larger text files are reported as not fully scanned
+max-archive-depth = 3
+gitleaks = "auto"              # auto | always | never
+
+# Turn rules off or change their severity. The denylist and the coverage rules
+# (scan.*, config.*, git.shallow-clone) cannot be changed here.
+disable = ["leak.phone-number"]
+severity = { "leak.numeric-id" = "note" }
+
+[heuristics]
+numeric-id-min-length = 10
+allowed-email-domains = ["acme-corp.example"]
+allowed-emails = ["security@acme.example"]
+allowed-numbers = ["4242424242"]
+allowed-hosts = ["build.acme.internal"]
+git-identity-domains = []      # commit emails besides no-reply addresses
+entropy-threshold = 4.3
+entropy-min-length = 24
+internal-patterns = [
+  { pattern = '(?i)\bheron-[a-z]+-(?:prod|staging)\b', label = "service names" },
+]
+
+# Known-good findings of built-in rules.
+[[allow]]
+rules = ["leak.*"]
+paths = ["tests/fixtures/**"]
+reason = "invented fixtures"
+
+[[allow]]
+rules = ["leak.email"]
+values = ["press@acme.example"]
+reason = "public press contact"

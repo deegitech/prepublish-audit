@@ -1,0 +1,8 @@
+# .pre-commit-config.yaml
+repos:
+  - repo: https://github.com/deegitech/prepublish-audit
+    rev: v0.1.0
+    hooks:
+      - id: prepublish-audit            # staged files, on every commit
+      - id: prepublish-audit-history    # whole repo + history, before every push
+        args: [--require-denylist]      # stop, instead of passing, when no denylist is found

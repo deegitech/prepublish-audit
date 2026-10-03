@@ -1,0 +1,20 @@
+# Hooks for https://pre-commit.com. The private denylist is read from
+# $PREPUBLISH_AUDIT_DENYLIST or ~/.config/prepublish-audit/denylist.txt;
+# it is never part of the hook configuration.
+- id: prepublish-audit
+  name: prepublish-audit (staged files)
+  description: Block secrets and internal information in the files you are about to commit.
+  entry: prepublish-audit scan --gitleaks never --quiet
+  language: python
+  pass_filenames: true
+  require_serial: true
+  types: [file]
+
+- id: prepublish-audit-history
+  name: prepublish-audit (whole repository and history)
+  description: Scan the files git would publish plus the full history before you push.
+  entry: prepublish-audit scan --git-files --history --quiet .
+  language: python
+  pass_filenames: false
+  always_run: true
+  stages: [pre-push, manual]
