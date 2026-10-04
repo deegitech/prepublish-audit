@@ -30,6 +30,10 @@ RULES_DOC = INFO_URI + "/blob/main/docs/rules.md"
 SARIF_SCHEMA = "https://json.schemastore.org/sarif-2.1.0.json"
 
 
+def _unmasked(text: str) -> str:
+    return text
+
+
 @dataclass
 class Report:
     findings: List[Finding]
@@ -46,7 +50,7 @@ class Report:
     suppressed: Counter = field(default_factory=Counter)
     notes: List[str] = field(default_factory=list)
     tools: List[str] = field(default_factory=list)
-    mask: Callable[[str], str] = lambda s: s
+    mask: Callable[[str], str] = field(default_factory=lambda: _unmasked)
     sarif_real_paths: bool = False
     empty_git_roots: List[str] = field(default_factory=list)
     """Scanned roots where --git-files found nothing git would publish."""

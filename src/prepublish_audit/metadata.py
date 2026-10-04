@@ -694,7 +694,7 @@ def builtin_fields(data: bytes, kind: str) -> List[MetaField]:
         elif kind in ("isobmff", "heif"):
             fields.extend(_isobmff(data))
     except (struct.error, IndexError, ValueError):
-        pass
+        pass  # truncated or malformed container: keep the fields read so far
     for packet in xmp_packets(data):
         fields.extend(xmp_fields(packet))
     return fields

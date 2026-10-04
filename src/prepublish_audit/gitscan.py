@@ -190,12 +190,12 @@ class Repo:
                 for sha in shas:
                     proc.stdin.write(sha.encode() + b"\n")  # type: ignore[union-attr]
             except (BrokenPipeError, OSError):
-                pass
+                pass  # git stopped reading; the reader loop below ends on EOF
             finally:
                 try:
                     proc.stdin.close()  # type: ignore[union-attr]
                 except OSError:
-                    pass
+                    pass  # already closed
 
         writer = threading.Thread(target=feed, daemon=True)
         writer.start()
